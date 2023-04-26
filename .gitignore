@@ -1,0 +1,17 @@
+# Dependencies
+/node_modules
+
+# Cache and temporary files
+*.log
+*.pid
+*.seed
+*.swp
+*.lock
+*.bak
+*.tmp
+.DS_Store
+
+# Environment and configuration files
+.env
+.env.local
+.env.*.local

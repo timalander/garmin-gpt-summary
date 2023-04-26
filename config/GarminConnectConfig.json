@@ -1,0 +1,34 @@
+{
+  "credentials": {
+    "user": "YOUR GARMIN EMAIL",
+    "secure_password": false,
+    "password": "YOUR GARMIN PASSWORD"
+  },
+  "data": {
+    "weight_start_date": "01/01/2023",
+    "sleep_start_date": "01/01/2023",
+    "rhr_start_date": "01/01/2023",
+    "monitoring_start_date": "01/01/2023",
+    "download_latest_activities": 7,
+    "download_all_activities": 1000
+  },
+  "copy": {
+    "mount_dir": "/Volumes/GARMIN"
+  },
+  "enabled_stats": {
+    "monitoring": true,
+    "steps": true,
+    "itime": true,
+    "sleep": true,
+    "rhr": true,
+    "weight": true,
+    "activities": true
+  },
+  "course_views": {
+    "steps": []
+  },
+  "modes": {},
+  "activities": {
+    "display": []
+  }
+}
