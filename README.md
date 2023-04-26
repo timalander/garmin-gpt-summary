@@ -54,7 +54,7 @@ This script sends an HTTP GET request to the `http://localhost:3000/send-summary
    FROM_EMAIL=sender@example.com
    FROM_EMAIL_DOMAIN=your_email_domain
    ```
-   * Important note: `garmindb` needs a persistent storage location to write the SQlite files. By default, the script assumes that they will be internally mounted at `/data/DBs`
+   * Important note: `garmindb` needs a persistent storage location to write the SQlite files. `GARMIN_SUMMARY_DB_PATH` should be set to an internally accessible path that stores the `garmin_summary.db` file. By default, this file lives in `/data/DBs`.
 4. Replace the placeholders in the `docker-compose.yml` file with your own information:
    * The `volumes:` section should be a mounted host storage where you can write the persistent Garmin data. Leave the `:/data` suffix (this specifies the VM mount point).
    * The `image:` name can be anything you want.
