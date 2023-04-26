@@ -33,11 +33,12 @@ This script sends an HTTP GET request to the `http://localhost:3000/send-summary
    ```
    OPENAI_API_KEY=your_openai_api_key
    MAILGUN_API_KEY=your_mailgun_api_key
-   GARMIN_SUMMARY_DB_PATH=/path/to/your/garmin/data # probably something like /data/DBs
+   GARMIN_SUMMARY_DB_PATH=/data/DBs
    TO_EMAIL=recipient@example.com
    FROM_EMAIL=sender@example.com
    FROM_EMAIL_DOMAIN=your_email_domain
    ```
+   * Important note: `garmindb` needs a persistent storage location to write the SQlite files. By default, the script assumes that they will be internally mounted at `/data/DBs`
 4. Replace the placeholders in the `docker-compose.yml` file with your own information:
    * The `volumes:` section should be a mounted host storage where you can write the persistent Garmin data. Leave the `:/data` suffix (this specifies the VM mount point).
    * The `image:` name can be anything you want.
