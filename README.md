@@ -2,6 +2,22 @@
 
 This application uses the `garmindb` Python package to sync health data from a Garmin device to an SQLite database. It then generates and sends a summary email containing the previous day's and month's health metrics, along with insights from the OpenAI GPT-3.5-turbo model. It utilizes Node.js, Express, SQLite3, OpenAI API, and Mailgun for email delivery.
 
+## Prerequisites
+
+Before you can run the Garmin Summary Emailer, you need to have the following tools and services set up:
+
+1. **Docker**: Install Docker on your system. Docker allows you to build, package, and distribute applications in a consistent and reproducible way. Visit [Docker's official website](https://www.docker.com/) for installation instructions.
+
+2. **Docker Compose**: Install Docker Compose, which enables you to manage multi-container applications. Follow the installation instructions on the [official Docker Compose website](https://docs.docker.com/compose/install/).
+
+3. **OpenAI API Key**: Sign up for an OpenAI account and obtain an API key. This key is required to access OpenAI's GPT-3 model, which generates the fitness summary. Visit [OpenAI's API documentation](https://beta.openai.com/docs/) to get started.
+
+4. **Mailgun API Key**: Sign up for a Mailgun account and obtain an API key. This key is needed to send the summary email using the Mailgun service. Visit [Mailgun's official website](https://www.mailgun.com/) to create an account and obtain an API key.
+
+5. **Garmin Connect Account**: Ensure you have a Garmin Connect account set up with data from your Garmin watch. This project uses the garmindb library to download and analyze your data.
+
+Once you have these prerequisites in place, you can follow the "How to Run" section to set up and run the Garmin Summary Emailer.
+
 ## Docker Setup
 
 To simplify deployment, I provide a Docker container that runs the TypeScript script, fetches data from the SQLite database, and sends an email with the summary. The setup also includes a Cron job that syncs the Garmin data with the container's local storage.
