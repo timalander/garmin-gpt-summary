@@ -33,7 +33,7 @@ This script sends an HTTP GET request to the `http://localhost:3000/send-summary
    ```
    OPENAI_API_KEY=your_openai_api_key
    MAILGUN_API_KEY=your_mailgun_api_key
-   GARMIN_SUMMARY_DB_PATH=/path/to/your/garmin/data
+   GARMIN_SUMMARY_DB_PATH=/path/to/your/garmin/data # probably something like /data/DBs
    TO_EMAIL=recipient@example.com
    FROM_EMAIL=sender@example.com
    FROM_EMAIL_DOMAIN=your_email_domain
@@ -41,7 +41,9 @@ This script sends an HTTP GET request to the `http://localhost:3000/send-summary
 4. Replace the placeholders in the `docker-compose.yml` file with your own information:
    * The `volumes:` section should be a mounted host storage where you can write the persistent Garmin data. Leave the `:/data` suffix (this specifies the VM mount point).
    * The `image:` name can be anything you want.
+
+5. Edit the `GarminConnectConfig.json` file, adding your Garmin username and password.
   
-5. Run `docker-compose up` to build and start the Docker container.
+6. Run `docker-compose up` to build and start the Docker container.
 
 With this setup, you will receive a well-organized summary of your Garmin fitness data in your inbox every day at 7 am.
