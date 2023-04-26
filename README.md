@@ -39,8 +39,8 @@ This script sends an HTTP GET request to the `http://localhost:3000/send-summary
    FROM_EMAIL_DOMAIN=your_email_domain
    ```
 4. Replace the placeholders in the `docker-compose.yml` file with your own information:
-   The `volumes:` section should be a mounted host storage where you can write the persistent Garmin data. Leave the `:/data` suffix (this specifies the VM mount point).
-   The `image:` name can be anything you want.
+   * The `volumes:` section should be a mounted host storage where you can write the persistent Garmin data. Leave the `:/data` suffix (this specifies the VM mount point).
+   * The `image:` name can be anything you want.
   
 5. Run `docker-compose up` to build and start the Docker container.
 
