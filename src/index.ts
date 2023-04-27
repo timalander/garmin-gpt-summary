@@ -207,6 +207,7 @@ const analyzeData = async (
             Example 2: Your RHR yesterday was 5.7 BPM higher than last month's average.
             Only compare if the daily data is significantly different from the average of the previous month. Do not simply list the data.
             Use numerals for numbers, not words. Example: 5, not five.
+            Do not reference stats that have no value, such as 0 RHR or 0 sleep, assume a reporting issues in this case.
             Only highloght information relevant to improving cardiovascular health and exercise performance.
             You must output with basic HTML formatting for the statistic in the summary (bold, italics). Example <b>bold</b> <i>italics</i>.
             Previous Day Data:\n${formattedDayData.summary}\n Previous Month Data:\n${formattedMonthData.summary}`,
@@ -265,15 +266,25 @@ const getDateInTimezone = (date: Date, timezone: string): Date => {
 
 const getPreviousDayData = async (): Promise<any> => {
   const db = await openDatabase(`${GARMIN_SUMMARY_DB_PATH}/garmin_summary.db`);
-  const currentDate = getDateInTimezone(new Date(), 'America/New_York');
-  currentDate.setDate(currentDate.getDate() - 1);
-  const previousDate = currentDate.toISOString().split('T')[0];
-  console.log('Previous date:', previousDate);
+  const today = getDateInTimezone(new Date(), 'America/New_York');
+  const yesterday = getDateInTimezone(new Date(), 'America/New_York');
+  yesterday.setDate(today.getDate() - 1);
+  const todayFormatted = today.toISOString().split('T')[0];
+  const yesterdayFormatted = yesterday.toISOString().split('T')[0];
+  console.log('Today date:', todayFormatted);
+  console.log('Yesterday date:', yesterdayFormatted);
+
+  let yesterdayData;
+  let todayData;
   try {
-    const row = await runQuery(db, 'SELECT * FROM days_summary WHERE day=?', [
-      previousDate,
+    yesterdayData = await runQuery(
+      db,
+      'SELECT * FROM days_summary WHERE day=?',
+      [yesterdayFormatted]
+    );
+    todayData = await runQuery(db, 'SELECT * FROM days_summary WHERE day=?', [
+      todayFormatted,
     ]);
-    return row;
   } catch (error) {
     throw new Error(
       `Error fetching previous day data: ${(error as Error).message}`
@@ -281,6 +292,16 @@ const getPreviousDayData = async (): Promise<any> => {
   } finally {
     db.close();
   }
+
+  console.log('Yesterday data:', yesterdayData);
+  console.log('Today data:', todayData);
+  const mergedData = {
+    ...yesterdayData,
+    sleep_avg: todayData.sleep_avg,
+    rem_sleep_avg: todayData.rem_sleep_avg,
+  };
+
+  return mergedData;
 };
 
 const getPreviousMonthData = async (): Promise<any> => {

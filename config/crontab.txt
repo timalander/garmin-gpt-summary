@@ -1,5 +1,5 @@
-# Run the sync at 4am every day
-0 4 * * * sh /app/scripts/sync-garmin-data.sh
+# Run the sync at 11:30am every day
+30 11 * * * sh /app/scripts/sync-garmin-data.sh
 
-# Trigger email at 7am every day
-0 7 * * * sh /app/scripts/send-email.sh
+# Trigger email at 12pm every day
+0 12 * * * sh /app/scripts/send-email.sh
