@@ -28,8 +28,8 @@ You can find the `Dockerfile` and `docker-compose.yml` in the repository. Before
 
 This project includes two Cron jobs:
 
-1. Sync Garmin data at 4 am every day.
-2. Trigger email at 7 am every day.
+1. Sync Garmin data at 11:30am EST every day.
+2. Trigger email at 12pm EST every day.
 
 These Cron jobs are defined in the `crontab.txt` file and are initialized using the `init-cron.sh` script.
 
