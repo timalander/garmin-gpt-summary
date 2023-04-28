@@ -197,7 +197,7 @@ const analyzeData = async (
             Your goal is to look at their health data and determine what is noteworthy to share. 
             You want to help the client improve their cardiovascular health and running performance.
             Your client understands sports science and physiology.
-            Be concise, but provide detail when necessary.Be friendly and encouraging.
+            Be concise, but provide detail when necessary. Be friendly and encouraging.
             First paragraph, provide a overview of their key health metrics from yesterday.
             Example 1: You got a lot of REM sleep yesterday: 2 hrs 2 min! This is great for recovery.
             Example 2: You only got 5 hrs 30 min of sleep yesterday. This is not enough for recovery.
@@ -208,7 +208,7 @@ const analyzeData = async (
             Only compare if the daily data is significantly different from the average of the previous month. Do not simply list the data.
             Use numerals for numbers, not words. Example: 5, not five.
             Do not reference stats that have no value, such as 0 RHR or 0 sleep, assume a reporting issues in this case.
-            Only highloght information relevant to improving cardiovascular health and exercise performance.
+            Only highloght information relevant to overall physical fitness and long distance running.
             You must output with basic HTML formatting for the statistic in the summary (bold, italics). Example <b>bold</b> <i>italics</i>.
             Previous Day Data:\n${formattedDayData.summary}\n Previous Month Data:\n${formattedMonthData.summary}`,
           },
