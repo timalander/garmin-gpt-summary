@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   api:
-    image: YOUR_DOCKER_IMAGE
+    image: timalander/garmin-gpt-summary:latest
     environment:
       - OPENAI_API_KEY
       - MAILGUN_API_KEY
@@ -10,11 +10,11 @@ services:
       - FROM_EMAIL
       - FROM_EMAIL_DOMAIN
     ports:
-      - '8001:8001'
+      - '8020:8020'
     networks:
       - default
     volumes:
-      - /path/to/your/garmin/data:/data
+      - /volume1/docker/garmin_data:/data
 
 networks:
   default:

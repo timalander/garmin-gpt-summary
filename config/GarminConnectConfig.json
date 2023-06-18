@@ -1,8 +1,8 @@
 {
   "credentials": {
-    "user": "YOUR GARMIN EMAIL",
+    "user": "tim.alander@gmail.com",
     "secure_password": false,
-    "password": "YOUR GARMIN PASSWORD"
+    "password": "Arsenal2000!"
   },
   "data": {
     "weight_start_date": "01/01/2023",
@@ -21,7 +21,7 @@
     "itime": true,
     "sleep": true,
     "rhr": true,
-    "weight": true,
+    "weight": false,
     "activities": true
   },
   "course_views": {

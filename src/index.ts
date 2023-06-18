@@ -1,40 +1,58 @@
 import * as sqlite3 from 'sqlite3';
 import axios from 'axios';
 import * as dotenv from 'dotenv';
-import MailgunClient from 'mailgun.js';
-import FormData from 'form-data';
 import express from 'express';
+import { spawn } from 'child_process';
+import { SESClient, SendEmailCommand } from '@aws-sdk/client-ses';
 
 const app = express();
-const port = 3000;
+const PORT = 8020;
 
 dotenv.config();
 
-const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY || '';
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GARMIN_SUMMARY_DB_PATH = process.env.GARMIN_SUMMARY_DB_PATH;
 const TO_EMAIL = process.env.TO_EMAIL || '';
-const FROM_EMAIL = process.env.FROM_EMAIL;
-const FROM_EMAIL_DOMAIN = process.env.FROM_EMAIL_DOMAIN || '';
+const EMAIL_AWS_ACCESS_KEY_ID = process.env.EMAIL_AWS_ACCESS_KEY_ID;
+const EMAIL_AWS_SECRET_KEY = process.env.EMAIL_AWS_SECRET_KEY;
+
+const mg = new SESClient({
+  region: 'us-east-1',
+  credentials: {
+    accessKeyId: EMAIL_AWS_ACCESS_KEY_ID || '',
+    secretAccessKey: EMAIL_AWS_SECRET_KEY || '',
+  },
+});
 
 const sendEmail = async (text: string, html: string): Promise<void> => {
-  const mailgun = new MailgunClient(FormData);
-  const mg = mailgun.client({
-    username: 'api',
-    key: MAILGUN_API_KEY,
-  });
-
   try {
-    await mg.messages.create(FROM_EMAIL_DOMAIN, {
-      from: `Garmin Assistant <${FROM_EMAIL}>`,
-      to: [TO_EMAIL],
-      subject: `Garmin Daily Report - ${new Date().toLocaleDateString()}`,
-      text: text,
-      html: html,
-    });
-    console.log('Email sent successfully');
+    await mg.send(
+      new SendEmailCommand({
+        Destination: {
+          ToAddresses: [TO_EMAIL],
+        },
+        Message: {
+          Body: {
+            Html: {
+              Charset: 'UTF-8',
+              Data: html,
+            },
+            Text: {
+              Charset: 'UTF-8',
+              Data: text,
+            },
+          },
+          Subject: {
+            Charset: 'UTF-8',
+            Data: `Garmin Daily Report - ${new Date().toLocaleDateString()}`,
+          },
+        },
+        Source: 'Garmin Assistant <info@alander.lol>',
+      })
+    );
+    console.log('[LOGGER] Email sent successfully');
   } catch (error) {
-    console.error(`Error sending email: ${(error as Error).message}`);
+    console.error(`[ERROR] Error sending email: ${(error as Error).message}`);
   }
 };
 
@@ -227,7 +245,9 @@ const analyzeData = async (
 
     return response.data.choices[0].message.content.trim();
   } catch (error) {
-    throw new Error(`Error calling OpenAI API: ${(error as Error).message}`);
+    throw new Error(
+      `[ERROR] Error calling OpenAI API: ${(error as Error).message}`
+    );
   }
 };
 
@@ -271,8 +291,6 @@ const getPreviousDayData = async (): Promise<any> => {
   yesterday.setDate(today.getDate() - 1);
   const todayFormatted = today.toISOString().split('T')[0];
   const yesterdayFormatted = yesterday.toISOString().split('T')[0];
-  console.log('Today date:', todayFormatted);
-  console.log('Yesterday date:', yesterdayFormatted);
 
   let yesterdayData;
   let todayData;
@@ -287,14 +305,12 @@ const getPreviousDayData = async (): Promise<any> => {
     ]);
   } catch (error) {
     throw new Error(
-      `Error fetching previous day data: ${(error as Error).message}`
+      `[ERROR] Error fetching previous day data: ${(error as Error).message}`
     );
   } finally {
     db.close();
   }
 
-  console.log('Yesterday data:', yesterdayData);
-  console.log('Today data:', todayData);
   const mergedData = {
     ...yesterdayData,
     sleep_avg: todayData.sleep_avg,
@@ -316,7 +332,6 @@ const getPreviousMonthData = async (): Promise<any> => {
     .toISOString()
     .split('T')[0];
 
-  console.log('Previous month:', firstDayPreviousMonth);
   try {
     const row = await runQuery(
       db,
@@ -326,11 +341,36 @@ const getPreviousMonthData = async (): Promise<any> => {
     return row;
   } catch (error) {
     throw new Error(
-      `Error fetching previous month data: ${(error as Error).message}`
+      `[ERROR] Error fetching previous month data: ${(error as Error).message}`
     );
   } finally {
     db.close();
   }
+};
+
+const syncLatestGarminData = async (): Promise<void> => {
+  const child = spawn('garmindb_cli.py', [
+    '--all',
+    '--download',
+    '--import',
+    '--analyze',
+    '--latest',
+  ]);
+
+  child.stdout.on('data', data => {
+    console.log(`[LOGGER] ${data}`);
+  });
+
+  child.stderr.on('data', data => {
+    console.error(`[ERROR] ${data}`);
+  });
+
+  child.on('close', code => {
+    if (code !== 0) {
+      throw new Error(`[ERROR] Child process exited with code ${code}`);
+    }
+    console.log(`[LOGGER] Child process exited with code ${code}`);
+  });
 };
 
 const sendSummaryEmail = async () => {
@@ -344,20 +384,30 @@ const sendSummaryEmail = async () => {
       generateEmailHTML(summary, previousDayData, previousMonthData)
     );
   } else {
-    console.log('No data available for the previous day.');
+    console.log('[LOGGER] No data available for the previous day');
   }
 };
 
-app.get('/send-summary', async (req, res) => {
+app.get('/send-summary-email', async (req, res) => {
   try {
     await sendSummaryEmail();
-    res.status(200).send('Summary email sent successfully.');
+    res.status(200).send('Summary email sent successfully');
   } catch (error) {
-    console.error('Error sending summary email:', error);
-    res.status(500).send('Error sending summary email.');
+    console.error('[ERROR] Error sending summary email:', error);
+    res.status(500).send('Error sending summary email');
   }
 });
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+app.get('/sync-latest-data', async (req, res) => {
+  try {
+    await syncLatestGarminData();
+    res.status(200).send('Garmin data synced successfully');
+  } catch (error) {
+    console.error('[ERROR] Error syncing Garmin data:', error);
+    res.status(500).send('Error syncing Garmin data');
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`[LOGGER] Server running on ${PORT}`);
 });

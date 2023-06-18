@@ -2,7 +2,7 @@ FROM node:alpine
 
 WORKDIR /app
 
-RUN apk add --update --no-cache py3-pip python3-dev gcc libc-dev linux-headers g++ make curl bash
+RUN apk add --update --no-cache py3-pip python3-dev gcc libc-dev linux-headers g++ make bash
 RUN pip3 install garmindb
 
 COPY package.json yarn.lock tsconfig.json ./
@@ -15,11 +15,6 @@ RUN chmod +x /usr/bin/garmindb_cli.py
 RUN mkdir /root/.GarminDb
 COPY config/GarminConnectConfig.json /root/.GarminDb
 
-
 COPY src ./src
-COPY scripts ./scripts
-COPY config/crontab.txt ./scripts
 
-RUN cd scripts && sh init-cron.sh
-
-CMD crond && yarn start
+CMD yarn start
